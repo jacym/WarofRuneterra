@@ -19,7 +19,7 @@ func cards(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	for _, c := range cardlist {
+	for _, c := range cardList {
 		log.Printf("card: %s\n", c)
 	}
 }
