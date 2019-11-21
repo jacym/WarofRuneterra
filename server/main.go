@@ -30,20 +30,24 @@ func indexCardSet(w http.ResponseWriter, r *http.Request) {
 }
 
 func submitPlayerCards(w http.ResponseWriter, r *http.Request) {
-	var cardList []string
+	var references []string
 
 	defer r.Body.Close()
 
-	enc := json.NewDecoder(r.Body)
-	err := enc.Decode(&cardList)
+	dec := json.NewDecoder(r.Body)
+	err := dec.Decode(&references)
 
 	if err != nil {
 		http.Error(w, http.StatusText(422), 422)
 		return
 	}
 
-	for _, c := range cardList {
-		log.Printf("card: %s\n", c)
+	enc := json.NewEncoder(w)
+	cardList := crossCards(set, references)
+
+	if err := enc.Encode(cardList); err != nil {
+		http.Error(w, http.StatusText(500), 500)
+		return
 	}
 }
 
