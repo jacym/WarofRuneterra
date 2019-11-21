@@ -7,6 +7,7 @@ pipeline {
   }
   stages {
     stage('Pull Dependencies') {
+      agent any
       steps {
         dir(path: 'server') {
           sh 'go get'
@@ -15,15 +16,10 @@ pipeline {
       }
     }
 
-    stage('Lint') {
+    stage('Build It') {
       parallel {
         stage('Lint') {
-          agent {
-            docker {
-              image 'golang:alpine'
-            }
-
-          }
+          agent any
           steps {
             dir(path: 'server') {
               sh 'go vet'
@@ -33,12 +29,7 @@ pipeline {
         }
 
         stage('Build') {
-          agent {
-            docker {
-              image 'golang:alpine'
-            }
-
-          }
+          agent any
           steps {
             dir(path: 'server') {
               sh 'go build'
