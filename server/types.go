@@ -6,8 +6,8 @@ type (
 	}
 
 	LoRCard struct {
-		ID     string
-		Name   string
-		Region string
+		ID     string `json:"id"`
+		Name   string `json:"name"`
+		Region string `json:"region"`
 	}
 )
