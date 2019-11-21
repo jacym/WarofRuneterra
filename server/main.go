@@ -2,7 +2,6 @@ package main
 
 import (
 	"encoding/json"
-	"fmt"
 	"log"
 	"net/http"
 	"time"
@@ -63,7 +62,7 @@ func cards(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
-	fmt.Println("WLoR v0.0.1")
+	log.Println("WLoR v0.0.1")
 
 	// config
 	if err := env.Parse(&cfg); err != nil {
@@ -86,5 +85,6 @@ func main() {
 		ReadTimeout:  15 * time.Second,
 	}
 
+	log.Printf("Listening on %s\n", srv.Addr)
 	log.Fatal(srv.ListenAndServe())
 }
