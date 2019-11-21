@@ -8,8 +8,10 @@ pipeline {
   stages {
     stage('Pull Dependencies') {
       steps {
-        dir(path: 'server')
-        sh 'go get'
+        dir(path: 'server') {
+          sh 'go get'
+        }
+
       }
     }
 
@@ -23,15 +25,19 @@ pipeline {
 
           }
           steps {
-            dir(path: 'server')
-            sh 'go vet'
+            dir(path: 'server') {
+              sh 'go vet'
+            }
+
           }
         }
 
         stage('Build') {
           steps {
-            dir(path: 'server')
-            sh 'go build'
+            dir(path: 'server') {
+              sh 'go build'
+            }
+
           }
         }
 
