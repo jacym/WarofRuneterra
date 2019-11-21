@@ -33,6 +33,12 @@ pipeline {
         }
 
         stage('Build') {
+          agent {
+            docker {
+              image 'golang:alpine'
+            }
+
+          }
           steps {
             dir(path: 'server') {
               sh 'go build'
