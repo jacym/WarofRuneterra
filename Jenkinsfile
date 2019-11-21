@@ -9,8 +9,7 @@ pipeline {
     stage('Pull Dependencies') {
       steps {
         dir(path: 'server')
-        sh '''# grab dependencies
-go get'''
+        sh 'go get'
       }
     }
 
