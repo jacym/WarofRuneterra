@@ -25,16 +25,14 @@ go get'''
           }
           steps {
             dir(path: 'server')
-            sh '''# lint
-go vet'''
+            sh 'go vet'
           }
         }
 
         stage('Build') {
           steps {
             dir(path: 'server')
-            sh '''# build
-go build'''
+            sh 'go build'
           }
         }
 
