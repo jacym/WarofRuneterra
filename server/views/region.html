@@ -1,9 +1,12 @@
 {{ define "region" }}
-<div class="region">
-  <div class="region__image">
-    <img src="{{ .Icon }}" alt="{{ .Region }}" />
+  {{ range $region, $points := . }}
+  <div class="region">
+    <div class="region__image">
+      <img src="" alt="{{ $region }}" />
+    </div>
+
+    <div class="region__title">{{ $region }}</div>
+    <div class="region__points">{{ $points }}</div>
   </div>
-  <div class="region__title">{{ .Region }}</div>
-  <div class="region__points">{{ .Points }}</div>
-</div>
+  {{ end }}
 {{ end }}
