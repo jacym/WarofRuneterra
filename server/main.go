@@ -4,17 +4,49 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
+	"path/filepath"
+	"strings"
+	"text/template"
 	"time"
 
 	"github.com/caarlos0/env"
 	"github.com/gorilla/mux"
 	"github.com/jacym/WarofRuneterra/server/dragon"
+
+	packr "github.com/gobuffalo/packr/v2"
 )
 
 var (
-	cfg Config
-	set []dragon.Card
+	cfg       Config
+	box       *packr.Box
+	templates *template.Template
+	set       []dragon.Card
 )
+
+func initReadTemplates() (box *packr.Box, tmpl *template.Template) {
+	box = packr.New("templates", "./views")
+	tmpl = template.New("_all")
+
+	files := []string{
+		"partial.html",
+		"region.html",
+		"show.html",
+	}
+
+	for _, t := range files {
+		contents, err := box.FindString(t)
+
+		if err != nil {
+			log.Println(err)
+			continue
+		}
+
+		name := strings.TrimSuffix(t, filepath.Ext(t))
+		template.Must(tmpl.New(name).Parse(contents))
+	}
+
+	return
+}
 
 func readCardSet() {
 	set = dragon.CardSet()
@@ -75,6 +107,9 @@ func main() {
 
 	// card set
 	readCardSet()
+
+	// templates (html views)
+	box, templates = initReadTemplates()
 
 	// router
 	r := mux.NewRouter()
