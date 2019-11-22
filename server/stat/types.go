@@ -6,7 +6,7 @@ type (
 	Regions []string
 
 	Reward struct {
-		regions Regions
-		set     PointSet
+		Regions Regions
+		Set     PointSet
 	}
 )

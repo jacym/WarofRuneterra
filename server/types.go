@@ -8,10 +8,10 @@ type (
 	}
 
 	Item struct {
-		ID     string         `json:"id"`
-		Href   string         `json:"href"`
-		Win    bool           `json:"win"`
-		Points *stat.PointSet `json:"points"`
+		ID     string       `json:"id"`
+		Href   string       `json:"href"`
+		Win    bool         `json:"win"`
+		Result *stat.Reward `json:"result"`
 	}
 
 	State struct {
