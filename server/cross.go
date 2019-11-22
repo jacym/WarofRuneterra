@@ -1,6 +1,9 @@
 package main
 
-import "github.com/jacym/WarofRuneterra/server/dragon"
+import (
+	"github.com/khoanguyen96/WarofRuneterra/server/dragon"
+	"github.com/khoanguyen96/WarofRuneterra/server/stat"
+)
 
 func findCard(set []dragon.Card, code string) *dragon.Card {
 	for _, c := range set {
@@ -12,18 +15,37 @@ func findCard(set []dragon.Card, code string) *dragon.Card {
 	return nil
 }
 
-func crossCards(set []dragon.Card, references []string) (result []*LoRCard) {
-	result = make([]*LoRCard, len(references))
+func crossCards(set []dragon.Card, references []string) (result []*dragon.Card) {
+	result = make([]*dragon.Card, 0)
 
 	for _, code := range references {
 		if origin := findCard(set, code); origin != nil {
-			result = append(result, &LoRCard{
-				ID:     origin.Code,
-				Name:   origin.Name,
-				Region: origin.Region,
-			})
+			result = append(result, origin)
 		}
 	}
 
 	return
+}
+
+func regions(cards []*dragon.Card) stat.Regions {
+	keys := make(map[string]bool)
+
+	for _, entry := range cards {
+		if _, ok := keys[entry.Region]; !ok {
+			keys[entry.Region] = true
+		}
+	}
+
+	names := make(stat.Regions, 0)
+
+	for k := range keys {
+		names = append(names, k)
+	}
+
+	return names
+}
+
+func save(item *Item) {
+	// danger: guard with mutext!
+	state.items[item.ID] = item
 }
