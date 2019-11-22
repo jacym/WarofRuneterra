@@ -1,4 +1,4 @@
-module github.com/khoanguyen96/WarofRuneterra/server
+module github.com/jacym/WarofRuneterra/server
 
 go 1.13
 

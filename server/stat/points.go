@@ -3,7 +3,7 @@ package stat
 import (
 	"math"
 
-	"github.com/khoanguyen96/WarofRuneterra/server/dragon"
+	"github.com/jacym/WarofRuneterra/server/dragon"
 )
 
 const PointStart = 100

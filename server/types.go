@@ -1,6 +1,6 @@
 package main
 
-import "github.com/khoanguyen96/WarofRuneterra/server/stat"
+import "github.com/jacym/WarofRuneterra/server/stat"
 
 type (
 	Config struct {

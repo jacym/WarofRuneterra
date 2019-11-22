@@ -12,8 +12,8 @@ import (
 	"github.com/bwmarrin/snowflake"
 	"github.com/caarlos0/env"
 	"github.com/gorilla/mux"
-	"github.com/khoanguyen96/WarofRuneterra/server/dragon"
-	"github.com/khoanguyen96/WarofRuneterra/server/stat"
+	"github.com/jacym/WarofRuneterra/server/dragon"
+	"github.com/jacym/WarofRuneterra/server/stat"
 
 	packr "github.com/gobuffalo/packr/v2"
 )

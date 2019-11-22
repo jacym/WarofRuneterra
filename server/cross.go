@@ -1,8 +1,8 @@
 package main
 
 import (
-	"github.com/khoanguyen96/WarofRuneterra/server/dragon"
-	"github.com/khoanguyen96/WarofRuneterra/server/stat"
+	"github.com/jacym/WarofRuneterra/server/dragon"
+	"github.com/jacym/WarofRuneterra/server/stat"
 )
 
 func findCard(set []dragon.Card, code string) *dragon.Card {
