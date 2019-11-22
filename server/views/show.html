@@ -1,0 +1,15 @@
+<div class="container">
+  <div class="title">
+      {{ if .Win }}
+        Win!
+      {{ else }}
+        Lose!
+      {{ end }}
+  </div>
+
+  <div class="statistics">
+    {{ range .Regions }}
+      {{ template region $ }}
+    {{ end }}
+  </div>
+</div>
