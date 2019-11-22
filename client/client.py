@@ -47,11 +47,28 @@ def attackerCheck(allCards, height, width):
         return -1
     else:
         return 0
+'''
+creates set of cards being played at that moment
+:param tempSet: the current tempSet of cards
+:param playedSet: the current cards in play on this poll
+:return: new tempSet of cards being played right now
+'''
+def playedCardsChooser(tempSet, playedSet):
+    newSet = set()
+    for card in playedSet:
+        if card not in tempSet:
+            newSet.add(card)
+        if card in tempSet:
+            newSet.add(card)
+    return newSet
+
 
 def main():
-    print("began polling")
-    gamesPlayed = 0
+    gamesPlayed = -1
     gameState = 0
+    pastGameState = 0
+    tempLocal = set()
+    cardsPlayedLocal = set()
     while True:
         #only poll once a second
         time.sleep(1)
@@ -62,23 +79,53 @@ def main():
         except:
             print('Lost Connection To Legends of Runeterra \n Closing War on Runeterra Client')
             break
+
         print("start process")
         if req.status_code == 200:
             received = yaml.safe_load(req.text)
-            print(received)
+            #print(received)
             if received['GameState'] == 'InProgress':
                 #find and set attacker states
                 attack = attackerCheck(received['Rectangles'], received['Screen']['ScreenHeight'], received['Screen']['ScreenWidth'])
                 if attack == 1:
+                    pastGameState = gameState
                     gameState = attack
                 elif attack == -1:
+                    pastGameState = gameState
                     gameState = attack
                 print(gameState)
 
-                
+                #populate tempSets with cards that potentially are played
+                played = set()
                 for rectangle in received['Rectangles']:
-                    if rectangle['LocalPlayer'] == True:
-                        print(rectangle['CardCode'], '\t', rectangle['TopLeftX'], '\t', rectangle['TopLeftY'])
+                    #if attacker is local player
+                    if gameState == 1:
+                        #potential attack, can be changed
+                        if rectangle['LocalPlayer'] == True and inPlay(rectangle['TopLeftY'], received['Screen']['ScreenHeight'], received['Screen']['ScreenWidth']):
+                            played.add(rectangle['CardCode'])
+                        #if opponent defense then attack is locked and these cards are confirmed played
+                        if rectangle['LocalPlayer'] == True and inPlay(rectangle['TopLeftY'], received['Screen']['ScreenHeight'], received['Screen']['ScreenWidth']):
+                            #lock player played cards in
+                            for card in tempLocal:
+                                cardsPlayedLocal.add(card)
+
+                    #if attacker is opponent
+                    elif gameState == -1:
+                        #potential defense, can be changed
+                        if rectangle['LocalPlayer'] == True and inPlay(rectangle['TopLeftY'], received['Screen']['ScreenHeight'], received['Screen']['ScreenWidth']):
+                            played.add(rectangle['CardCode'])
+                
+                #if the attacker has changed, the played cards are commited and added to final list
+                if gameState != pastGameState and pastGameState != 0:
+                    for card in tempLocal:
+                        cardsPlayedLocal.add(card)
+                    pastGameState = gameState
+                    print(cardsPlayedLocal)
+
+                #commit these to a temp with intersect
+                tempLocal = playedCardsChooser(tempLocal, played)
+                
+
             elif received['GameState'] == 'Menus':
                 gameState = yaml.safe_load(reqGame.text)
                 print(gameState)
@@ -86,6 +133,11 @@ def main():
                     gamesPlayed = gameState['GameID']
                     print(gameState['LocalPlayerWon'])
                     #send completed game card set to server here
+                    for card in tempLocal:
+                        cardsPlayedLocal.add(card)
+                    print(cardsPlayedLocal)
+                    #reset sets for next game
+                    cardsPlayedLocal = set()
         
 
 main()
