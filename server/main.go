@@ -103,6 +103,9 @@ func submitPlayerCards(w http.ResponseWriter, r *http.Request) {
 		Win:    win,
 	}
 
+	log.Printf("id: %s\n", item.ID)
+	log.Printf("link: %s\n", "/view/"+item.ID)
+
 	save(item) // todo: add/check error
 
 	if err := enc.Encode(&item); err != nil {
