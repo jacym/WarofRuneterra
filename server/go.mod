@@ -1,8 +1,9 @@
-module github.com/jacym/WarofRuneterra/server
+module github.com/khoanguyen96/WarofRuneterra/server
 
 go 1.13
 
 require (
+	github.com/bwmarrin/snowflake v0.3.0
 	github.com/caarlos0/env v3.5.0+incompatible
 	github.com/gobuffalo/envy v1.8.1 // indirect
 	github.com/gobuffalo/logger v1.0.2 // indirect
