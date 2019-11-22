@@ -16,4 +16,9 @@
   </div>
 </div>
 
+<script type="application/javascript">
+  var item = '{{ .Encode }}';
+  window.item = JSON.parse(item);
+</script>
+
 {{ template "footer" }}

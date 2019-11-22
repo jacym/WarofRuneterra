@@ -1,6 +1,8 @@
 package main
 
 import (
+	"encoding/json"
+
 	"github.com/jacym/WarofRuneterra/server/dragon"
 	"github.com/jacym/WarofRuneterra/server/stat"
 )
@@ -48,4 +50,13 @@ func regions(cards []*dragon.Card) stat.Regions {
 func save(item *Item) {
 	// danger: guard with mutext!
 	state.items[item.ID] = item
+}
+
+func (i *Item) Encode() string {
+	b, err := json.Marshal(i)
+	if err != nil {
+		return ""
+	}
+
+	return string(b)
 }
