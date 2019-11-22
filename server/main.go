@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"io"
 	"log"
 	"net/http"
 	"path/filepath"
@@ -71,42 +72,83 @@ func indexCardSet(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func playerCards(r io.Reader) ([]*dragon.Card, error) {
+	var (
+		references []string
+		cards      []*dragon.Card
+	)
+
+	dec := json.NewDecoder(r)
+	err := dec.Decode(&references)
+
+	cards = crossCards(set, references)
+
+	return cards, err
+}
+
 func submitPlayerCards(w http.ResponseWriter, r *http.Request) {
 	// todo: add win/lose
-	var references []string
 
 	defer r.Body.Close()
 
-	dec := json.NewDecoder(r.Body)
-	err := dec.Decode(&references)
+	enc := json.NewEncoder(w)
+	cards, err := playerCards(r.Body)
 
 	if err != nil {
 		http.Error(w, http.StatusText(422), 422)
 		return
 	}
 
-	enc := json.NewEncoder(w)
-	cardList := crossCards(set, references)
-
 	// todo: shove this inside stat points.go
-	cardRegions := regions(cardList)
-
-	re := stat.WithRegion(cardRegions)
+	re := stat.WithRegion(
+		regions(cards),
+	)
 
 	win := true // todo: fk
 
-	points := re.Calc(win, cardList)
+	re.Calc(win, cards)
 
 	item := &Item{
 		ID:     flaker.Generate().String(),
-		Points: points,
 		Win:    win,
+		Result: re,
 	}
 
 	log.Printf("id: %s\n", item.ID)
 	log.Printf("link: %s\n", "/view/"+item.ID)
 
 	save(item) // todo: add/check error
+
+	if err := enc.Encode(&item); err != nil {
+		http.Error(w, http.StatusText(500), 500)
+		return
+	}
+}
+
+func updatePlayerCards(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	item, ok := state.items[vars["id"]]
+
+	// todo: add win/lose
+	win := true
+
+	if !ok {
+		http.Error(w, http.StatusText(404), 404)
+		return
+	}
+
+	defer r.Body.Close()
+
+	cards, err := playerCards(r.Body)
+
+	if err != nil {
+		http.Error(w, http.StatusText(422), 422)
+		return
+	}
+
+	item.Result.Calc(win, cards)
+
+	enc := json.NewEncoder(w)
 
 	if err := enc.Encode(&item); err != nil {
 		http.Error(w, http.StatusText(500), 500)
@@ -122,6 +164,8 @@ func cards(w http.ResponseWriter, r *http.Request) {
 	case "POST":
 		submitPlayerCards(w, r)
 		break
+	case "PUT":
+		updatePlayerCards(w, r)
 	default:
 		http.Error(w, http.StatusText(405), 405)
 		break
@@ -165,6 +209,7 @@ func main() {
 	// router
 	r := mux.NewRouter()
 	r.HandleFunc("/cards", cards).Methods("GET", "POST")
+	r.HandleFunc("/cards/{id}", cards).Methods("PUT")
 	r.HandleFunc("/view/{id}", show)
 
 	srv := &http.Server{

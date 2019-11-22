@@ -10,7 +10,7 @@ const PointStart = 100
 
 func WithRegion(r Regions) *Reward {
 	re := &Reward{
-		regions: r,
+		Regions: r,
 	}
 
 	re.begin()
@@ -19,17 +19,17 @@ func WithRegion(r Regions) *Reward {
 }
 
 func (r *Reward) begin() {
-	r.set = make(PointSet, len(r.regions))
+	r.Set = make(PointSet, len(r.Regions))
 
-	for _, region := range r.regions {
-		r.set[region] = PointStart
+	for _, region := range r.Regions {
+		r.Set[region] = PointStart
 	}
 }
 
 func (r *Reward) tallyInit() map[string]int64 {
 	tally := make(map[string]int64)
 
-	for _, region := range r.regions {
+	for _, region := range r.Regions {
 		tally[region] = 0
 	}
 
@@ -54,11 +54,11 @@ func (r *Reward) Calc(win bool, cards []*dragon.Card) *PointSet {
 		i := int64(score)
 
 		if win {
-			r.set[region] += i * 10
+			r.Set[region] += i * 10
 		} else {
-			r.set[region] -= (1 - i) * 10
+			r.Set[region] -= (1 - i) * 10
 		}
 	}
 
-	return &r.set
+	return &r.Set
 }
