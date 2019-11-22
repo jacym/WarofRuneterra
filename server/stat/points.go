@@ -47,7 +47,7 @@ func (r *Reward) Calc(win bool, regions []string) *PointSet {
 		if win {
 			r.set[region] += score * 10
 		} else {
-			r.set[region] += (1 - score) * 10
+			r.set[region] -= (1 - score) * 10
 		}
 	}
 
