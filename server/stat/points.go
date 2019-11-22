@@ -1,5 +1,11 @@
 package stat
 
+import (
+	"math"
+
+	"github.com/khoanguyen96/WarofRuneterra/server/dragon"
+)
+
 const PointStart = 100
 
 func WithRegion(r Regions) *Reward {
@@ -21,7 +27,7 @@ func (r *Reward) begin() {
 }
 
 func (r *Reward) tallyInit() map[string]int64 {
-	tally := make(map[string]int64, len(r.regions))
+	tally := make(map[string]int64)
 
 	for _, region := range r.regions {
 		tally[region] = 0
@@ -30,24 +36,27 @@ func (r *Reward) tallyInit() map[string]int64 {
 	return tally
 }
 
-func (r *Reward) Calc(win bool, regions []string) *PointSet {
+func (r *Reward) Calc(win bool, cards []*dragon.Card) *PointSet {
 	tally := r.tallyInit()
-	total := len(regions)
+	total := len(cards)
 
-	for _, name := range regions {
-		if t, ok := tally[name]; ok {
-			tally[name] = t + 1
+	for _, c := range cards {
+		if t, ok := tally[c.Region]; ok {
+			tally[c.Region] = t + 1
 		}
 	}
 
 	// todo: win or lose?
 	for region, hits := range tally {
-		score := (hits / int64(total)) * 100
+		score := (float64(hits) / float64(total)) * 100.0
+		score = math.Round(score)
+
+		i := int64(score)
 
 		if win {
-			r.set[region] += score * 10
+			r.set[region] += i * 10
 		} else {
-			r.set[region] -= (1 - score) * 10
+			r.set[region] -= (1 - i) * 10
 		}
 	}
 
