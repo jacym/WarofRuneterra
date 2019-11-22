@@ -1,10 +1,23 @@
 package main
 
-import "github.com/jacym/WarofRuneterra/server/stat"
+import (
+	"github.com/jacym/WarofRuneterra/server/dragon"
+	"github.com/jacym/WarofRuneterra/server/stat"
+)
 
 type (
 	Config struct {
 		Port string `env:"PORT" envDefault:"8080"`
+	}
+
+	RequestItem struct {
+		Win       bool     `json:"win"`
+		CardCodes []string `json:"card_codes`
+	}
+
+	RawItem struct {
+		Win bool           `json:"win"`
+		Set []*dragon.Card `json:"set"`
 	}
 
 	Item struct {

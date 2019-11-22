@@ -72,18 +72,18 @@ func indexCardSet(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func playerCards(r io.Reader) ([]*dragon.Card, error) {
-	var (
-		references []string
-		cards      []*dragon.Card
-	)
+func playerCards(r io.Reader) (*RawItem, error) {
+	var ref RequestItem
 
 	dec := json.NewDecoder(r)
-	err := dec.Decode(&references)
+	err := dec.Decode(&ref)
 
-	cards = crossCards(set, references)
+	raw := &RawItem{
+		Win: ref.Win,
+		Set: crossCards(set, ref.CardCodes),
+	}
 
-	return cards, err
+	return raw, err
 }
 
 func submitPlayerCards(w http.ResponseWriter, r *http.Request) {
@@ -92,7 +92,7 @@ func submitPlayerCards(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 
 	enc := json.NewEncoder(w)
-	cards, err := playerCards(r.Body)
+	raw, err := playerCards(r.Body)
 
 	if err != nil {
 		http.Error(w, http.StatusText(422), 422)
@@ -101,16 +101,14 @@ func submitPlayerCards(w http.ResponseWriter, r *http.Request) {
 
 	// todo: shove this inside stat points.go
 	re := stat.WithRegion(
-		regions(cards),
+		regions(raw.Set),
 	)
 
-	win := true // todo: fk
-
-	re.Calc(win, cards)
+	re.Calc(raw.Win, raw.Set)
 
 	item := &Item{
 		ID:     flaker.Generate().String(),
-		Win:    win,
+		Win:    raw.Win,
 		Result: re,
 	}
 
@@ -129,9 +127,6 @@ func updatePlayerCards(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	item, ok := state.items[vars["id"]]
 
-	// todo: add win/lose
-	win := true
-
 	if !ok {
 		http.Error(w, http.StatusText(404), 404)
 		return
@@ -139,14 +134,15 @@ func updatePlayerCards(w http.ResponseWriter, r *http.Request) {
 
 	defer r.Body.Close()
 
-	cards, err := playerCards(r.Body)
+	raw, err := playerCards(r.Body)
 
 	if err != nil {
 		http.Error(w, http.StatusText(422), 422)
 		return
 	}
 
-	item.Result.Calc(win, cards)
+	item.Win = raw.Win
+	item.Result.Calc(raw.Win, raw.Set)
 
 	enc := json.NewEncoder(w)
 
