@@ -1,0 +1,24 @@
+{{ template "header" }}
+
+<div class="container">
+  <div class="title">
+      {{ if .Win }}
+        Win!
+      {{ else }}
+        Lose!
+      {{ end }}
+
+      <small>{{ .ID }}</small>
+  </div>
+
+  <div class="statistics">
+    {{ template "region" .Points }}
+  </div>
+</div>
+
+<script type="application/javascript">
+  var item = '{{ .Encode }}';
+  window.item = JSON.parse(item);
+</script>
+
+{{ template "footer" }}
