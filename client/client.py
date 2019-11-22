@@ -69,6 +69,7 @@ def main():
     pastGameState = 0
     tempLocal = set()
     cardsPlayedLocal = set()
+    id = ''
     while True:
         #only poll once a second
         time.sleep(1)
@@ -130,16 +131,21 @@ def main():
                 gameState = yaml.safe_load(reqGame.text)
                 print(gameState)
                 if gameState["GameID"] > gamesPlayed:
-                    sendCard = {}
-                    gamesPlayed = gameState['GameID']
-                    print(gameState['LocalPlayerWon'])
+                    #print(gameState['LocalPlayerWon'])
                     #send completed game card set to server here
                     for card in tempLocal:
                         cardsPlayedLocal.add(card)
-                    sendCard['cards'] = list(cardsPlayedLocal)
-                    jsonCards = json.dumps(sendCard)
-                    requests.post("http://localhost:8000/cards", jsonCards)
-                    print(cardsPlayedLocal)
+                    jsonCards = json.dumps(list(cardsPlayedLocal))
+                    #if the first game of this session
+                    if gamesPlayed == -1:
+                        a = requests.post("http://localhost:8080/cards", data = jsonCards)
+                        id = yaml.safe_load(a.text)["id"]
+                        print("http://localhost:8080/view/"+ id)
+                    else:
+                        a = requests.put("http://localhost:8080/cards/" + id, data = jsonCards)
+                        print(a.status_code)
+                    #print(cardsPlayedLocal)
+                    gamesPlayed = gameState['GameID']
                     #reset sets for next game
                     cardsPlayedLocal = set()
         
