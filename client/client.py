@@ -2,11 +2,6 @@ import requests
 import time
 import yaml, json
 
-#TODO
-#add turn detection to determine when turns switch
-    #using turn detection commit units to a played set
-#send final set to server
-#make in play detection variable to different resolutions for future proof
 
 
 '''
@@ -70,6 +65,8 @@ def main():
     tempLocal = set()
     cardsPlayedLocal = set()
     id = ''
+
+    print("Program Started")
     while True:
         #only poll once a second
         time.sleep(1)
@@ -81,7 +78,6 @@ def main():
             print('Lost Connection To Legends of Runeterra \n Closing War on Runeterra Client')
             break
 
-        print("start process")
         if req.status_code == 200:
             received = yaml.safe_load(req.text)
             #print(received)
@@ -94,7 +90,6 @@ def main():
                 elif attack == -1:
                     pastGameState = gameState
                     gameState = attack
-                print(gameState)
 
                 #populate tempSets with cards that potentially are played
                 played = set()
@@ -121,7 +116,7 @@ def main():
                     for card in tempLocal:
                         cardsPlayedLocal.add(card)
                     pastGameState = gameState
-                    print(cardsPlayedLocal)
+                    #print(cardsPlayedLocal)
 
                 #commit these to a temp with intersect
                 tempLocal = playedCardsChooser(tempLocal, played)
@@ -129,7 +124,7 @@ def main():
 
             elif received['GameState'] == 'Menus':
                 gameState = yaml.safe_load(reqGame.text)
-                print(gameState)
+                #print(gameState)
                 if gameState["GameID"] > gamesPlayed:
                     #print(gameState['LocalPlayerWon'])
                     #send completed game card set to server here
@@ -143,7 +138,7 @@ def main():
                         print("http://localhost:8080/view/"+ id)
                     else:
                         a = requests.put("http://localhost:8080/cards/" + id, data = jsonCards)
-                        print(a.status_code)
+                        #print(a.status_code)
                     #print(cardsPlayedLocal)
                     gamesPlayed = gameState['GameID']
                     #reset sets for next game
