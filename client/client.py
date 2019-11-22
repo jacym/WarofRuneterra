@@ -1,6 +1,6 @@
 import requests
 import time
-import yaml
+import yaml, json
 
 #TODO
 #add turn detection to determine when turns switch
@@ -130,11 +130,15 @@ def main():
                 gameState = yaml.safe_load(reqGame.text)
                 print(gameState)
                 if gameState["GameID"] > gamesPlayed:
+                    sendCard = {}
                     gamesPlayed = gameState['GameID']
                     print(gameState['LocalPlayerWon'])
                     #send completed game card set to server here
                     for card in tempLocal:
                         cardsPlayedLocal.add(card)
+                    sendCard['cards'] = list(cardsPlayedLocal)
+                    jsonCards = json.dumps(sendCard)
+                    requests.post("http://localhost:8000/cards", jsonCards)
                     print(cardsPlayedLocal)
                     #reset sets for next game
                     cardsPlayedLocal = set()
