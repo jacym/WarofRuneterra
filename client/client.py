@@ -130,14 +130,21 @@ def main():
                     #send completed game card set to server here
                     for card in tempLocal:
                         cardsPlayedLocal.add(card)
-                    jsonCards = json.dumps(list(cardsPlayedLocal))
+
+                    req = {
+                        'win': gameState["LocalPlayerWon"],
+                        'card_codes': list(cardsPlayedLocal),
+                    }
+
+                    jsonreq = json.dumps(req)
+
                     #if the first game of this session
                     if gamesPlayed == -1:
-                        a = requests.post("http://localhost:8080/cards", data = jsonCards)
+                        a = requests.post("http://localhost:8080/cards", data = jsonreq)
                         id = yaml.safe_load(a.text)["id"]
                         print("http://localhost:8080/view/"+ id)
                     else:
-                        a = requests.put("http://localhost:8080/cards/" + id, data = jsonCards)
+                        a = requests.put("http://localhost:8080/cards/" + id, data = jsonreq)
                         #print(a.status_code)
                     #print(cardsPlayedLocal)
                     gamesPlayed = gameState['GameID']
